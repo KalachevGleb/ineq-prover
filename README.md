@@ -6,7 +6,7 @@ Automatic inequality prover based on interval arithmetic and symbolic computatio
     raise CannotSolve
 
 
-##описание функции
+##  описание функции
 
 
 Функция is_non_negative принимает на вход 2 аргумента:формулу в виде строки и отрезок в виде строки. Возвращает True или False, выбрасывает исключение. 
