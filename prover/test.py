@@ -5,12 +5,17 @@ import sympy as sym
 # Каждый тест -- тройка (формула f(x), отрезок [a,b], истинность утверждения: "f(x)>=0 при a <= x <= b")
 # TODO: Необходимо пополнить этот список
 tests = [
-    ('sin(x)', [0, sym.pi], True),
-    ('cos(x)', [0, sym.pi], False),
-    ('x-sin(x)', [0, 1], True),
-    ('cos(x)+sin(x)', [0, 2], True),
-    ('cos(x)+sin(x)', [0, 6], False),
-    ('sin(x)-sin(sin(x))', [0, 1], True)
+    ('x^20*(1-x^10)', '(0,1)', True),
+    ('sin(x)-sin(sin(x))', '(0,1)', True),
+    ('x-sin(x)', '(0,1)', True),
+    ('sin(sin(x))-x', '(0,1)', False),
+    ('sin(x)-x', '(0,1)', False),
+    ('cos(x)-1+x^2/2+1/1000', '[-2,1]', True),
+    ('x^2-1', '(-2,2)', False),
+    ('x^2+x-1', '(1,2)', True),
+    ('x^2+x-1', '(-3,1)', False),
+    ('(x+1)*(x^2-10/3*x+3)', '[1,3]', True),
+    ('(x+1)*(x^2-10/3*x+3)', '(1,3)', True),
 ]
 
 
@@ -21,7 +26,7 @@ def run_tests():
 
     for expr, segm, answer in tests:
         try:
-            r = is_non_negative(expr, 'x', segm)
+            r = is_non_negative(expr, segm)
             if r != answer:
                 print(f'Wrong answer for f(x) = {expr} in {segm}: {r}, correct is: {answer}')
                 wrong += 1

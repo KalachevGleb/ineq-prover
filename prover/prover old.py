@@ -6,13 +6,10 @@ from graphviz import Digraph
 import sympy as sym
 import sys
 from sympy.plotting.intervalmath import interval
-from CannotSolve import *
+
 import os
 
 os.environ["PATH"] += os.pathsep + 'C:/Program Files/Graphviz/bin/'
-
-
-
 
 
 class Tree_node:
@@ -54,7 +51,7 @@ class Tree_node:
         if (Tree_node.OPERATORS[operand][1] == 'OO'):
             self.type = 'OO'
             # для операции мы храним саму лямбда-функцию операции
-
+            
             self.operation = Tree_node.OPERATORS[operand][2]
             # операнд всего один. Это вершина дерева
             self.subnode = left
@@ -113,8 +110,8 @@ class Tree_node:
 
     def get_visual(self, graph, id):
         if (self.is_value_computed):
-            # iv.dps = 1
-            # mp.dps = 1
+            #iv.dps = 1
+           # mp.dps = 1
             graph.node(name=str(id), label='%s\n%s' % (self.name, self.value.__str__()))
         else:
             graph.node(name=str(id), label='%s' % (self.name))
@@ -151,7 +148,7 @@ class Tree_node:
 def parse(formula_string):
     number = ''
     # костыль для пропуска лишних символов у операторов, запись которых больше 1 символа
-
+   
     skip_counter = 0
     is_unary = True
     for i in range(0, len(formula_string)):
@@ -258,10 +255,10 @@ def subdiv(tree_root, c):
         Tree_node.default_segment = c.b
         r_s_r = tree_root.recompute_value()
         if ((r_s_l in iv.mpf(['-inf', 0])) or (r_s_r in iv.mpf(['-inf', 0]))):
-            return [], [c], 0
+            return [], [c]
         else:
-            p_s_l, n_s_l, n_1 = subdiv(tree_root, iv.mpf([c.a, c.mid]))
-            p_s_r, n_s_r, n_2 = subdiv(tree_root, iv.mpf([c.mid, c.b]))
+            p_s_l, n_s_l = subdiv(tree_root, iv.mpf([c.a, c.mid]))
+            p_s_r, n_s_r = subdiv(tree_root, iv.mpf([c.mid, c.b]))
             res_p = []
             res_n = []
             for i in p_s_l:
@@ -272,9 +269,14 @@ def subdiv(tree_root, c):
                 res_n.append(i)
             for i in n_s_r:
                 res_n.append(i)
-            return res_p, res_n, n_1 + n_2 + 1
+            return res_p, res_n
     else:
-        return [c], [], 0
+        return [c], []
+
+
+
+
+
 
 
 # функция получения производной
@@ -352,6 +354,8 @@ def find_eps(base_expr, x0, left=True, base_eps=1):
                 eps *= 0.5
     return eps
 
+   
+
     # f(x) = x
     # f(0) = 0
     # f'(0) = 1, f'(0.0024) = 1
@@ -365,6 +369,7 @@ def find_eps(base_expr, x0, left=True, base_eps=1):
 
 # На вход поступает строка формулы, границы ОТРЕЗКА и флаг рисовать ли PDF
 def is_positive(formula, x_0, x_1, render=False):
+   
     def_seg = iv.mpf([x_0, x_1])
     # Задание интервала по-умолчанию
     Tree_node.default_segment = def_seg
@@ -388,8 +393,7 @@ def is_positive(formula, x_0, x_1, render=False):
     # else:
     #     return True,[]
     # Разбиение для дерева на основе интервала по-умолчанию
-    q, v, n = subdiv(p, Tree_node.default_segment)
-    print("количество делений", n)
+    q, v = subdiv(p, Tree_node.default_segment)
     # print(q)
     # print(v)
     # вывод True/False
@@ -440,11 +444,11 @@ def is_non_negative(formula, seg_val):
                 print('f(x)=' + formula + '\n is not positive on', '[', int_x_0, int_x_1, ']')
             return False
     except:
-        print('a', 'b', 'c')
+        print('a','b','c')
         print(sys.exc_info())
         print('=^.^= Error :) Smth reeeeeally bad happend. Sorry. =^.^=')
-        raise CannotSolve(formula)
-
+        return None
+   
 
 def run_tests():
     data = [
@@ -454,12 +458,12 @@ def run_tests():
         ('sin(sin(x))-x', '(0,1)', False),
         ('sin(x)-x', '(0,1)', False),
         ('cos(x)-1+x^2/2+1/1000', '[-2,1]', True),
-        ('x^2-1', '(-2,2)', False),
+        ('x^2-1', '(-2,2)', True),
         ('x^2+x-1', '(1,2)', True),
         ('x^2+x-1', '(-3,1)', True),
         ('(x+1)*(x^2-10/3*x+3)', '[1,3]', True),
         ('(x+1)*(x^2-10/3*x+3)', '(1,3)', True),
-    ]
+        ]
 
     for t in data:
         result = is_non_negative(t[0], t[1])
